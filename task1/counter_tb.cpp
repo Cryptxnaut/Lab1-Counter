@@ -23,6 +23,9 @@ int main(int argc, char **argv, char **env){
     top->rst = 1;
     top->en = 0;
 
+    //pause state
+    int pauseRem = 0;
+    unsigned int prevCount = 0u;
     //run simulation for many clock cycles
     for(i = 0; i < 300; i++){
 
@@ -33,8 +36,25 @@ int main(int argc, char **argv, char **env){
             top->eval ();
         }
 
-        top->rst = (i < 2) | (i == 15);
-        top->en = (i > 4);
+        unsigned int curCount = (unsigned int) top->count;
+        if(pauseRem > 0){
+            top->en = 0;
+            --pauseRem;
+        }
+        else{
+            bool normalEn = (i > 4);
+            if(normalEn && curCount == 0x9u && prevCount != 0x9u){
+                //start 3 cycle pause
+                pauseRem = 3;
+                top->en = 0;
+            }
+            else{
+                top->en = normalEn ? 1 : 0;
+            }
+        }
+        prevCount = curCount;
+
+        top->rst = (i < 2);
         if (Verilated::gotFinish()) exit(0);
     }
     tfp->close();

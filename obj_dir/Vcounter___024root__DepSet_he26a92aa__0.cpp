@@ -22,7 +22,7 @@ void Vcounter___024root___eval(Vcounter___024root* vlSelf) {
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vcounter___024root___eval\n"); );
     // Body
     if (((IData)(vlSelf->clk) & (~ (IData)(vlSelf->__Vclklast__TOP__clk)))) {
-        Vcounter___024root___sequent__TOP__0(vlSelf);
+        Vcounter___024root___sequent__TOP__0(vlSelf); //detects falling edge of clock
     }
     // Final
     vlSelf->__Vclklast__TOP__clk = vlSelf->clk;
