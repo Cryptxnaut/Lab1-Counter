@@ -2,40 +2,85 @@
 #include "verilated.h"
 #include "verilated_vcd_c.h"
 
-int main(int argc, char **argv) {
-    Verilated::commandArgs(argc, argv);
+// Modify the testbench so that you stop counting for 3 cycles once the counter reaches 0x9, and then resume counting. You may also need to change the stimulus for rst.
+// The current counter has a synchronous reset. To implement asynchronous reset, you can change line 11 of counter.sv to detect change in rst signal. (See notes.)
 
+int main(int argc, char **argv, char **env){
+    int i;
+    int clk;
+
+    Verilated::commandArgs(argc, argv);
     // init top verilog instance
     Vcounter* top = new Vcounter;
-
     // init trace dump
     Verilated::traceEverOn(true);
     VerilatedVcdC* tfp = new VerilatedVcdC;
-    top->trace(tfp, 99);
-    tfp->open("counter.vcd");
+    top->trace (tfp, 99);
+    tfp->open ("counter.vcd");
 
     // initialise simulation inputs
-    top->clk = 0;
+    top->clk = 1;
     top->rst = 1;
     top->en = 0;
 
-    // run simulation for many clock cycles
-    for (int i = 0; i < 300; ++i) {
-        // dump variables into VCD file and toggle clock
-        for (int clk = 0; clk < 2; ++clk) {
-            tfp->dump(2 * i + clk);
+    //run simulation for many clock cycles
+    for(i = 0; i < 300; i++){
+
+        //dump variables into VCD file and toggle clock
+        for(clk = 0; clk < 2; clk++){
+            tfp->dump (2 * i + clk);
             top->clk = !top->clk;
-            top->eval();
+            top->eval ();
         }
 
-        top->rst = (i < 2) || (i == 15);
+        top->rst = (i < 2) | (i == 15);
         top->en = (i > 4);
-        if (Verilated::gotFinish())
-            break;
+        if (Verilated::gotFinish()) exit(0);
     }
-
     tfp->close();
-    delete top;
-    delete tfp;
-    return 0;
+    exit(0);
+
 }
+
+
+
+/*
+int main(int argc, char **argv, char **env){
+    int i;
+    int clk;
+
+    Verilated::commandArgs(argc, argv);
+    // init top verilog instance
+    Vcounter* top = new Vcounter;
+    // init trace dump
+    Verilated::traceEverOn(true);
+    VerilatedVcdC* tfp = new VerilatedVcdC;
+    top->trace (tfp, 99);
+    tfp->open ("counter.vcd");
+
+    // initialise simulation inputs
+    top->clk = 1;
+    top->rst = 1;
+    top->en = 0;
+
+    //run simulation for many clock cycles
+    for(i = 0; i < 300; i++){
+
+        //dump variables into VCD file and toggle clock
+        for(clk = 0; clk < 2; clk++){
+            tfp->dump (2 * i + clk);
+            top->clk = !top->clk;
+            top->eval ();
+        }
+
+        top->rst = (i < 2) | (i == 15);
+        top->en = (i > 4);
+        if (Verilated::gotFinish()) exit(0);
+    }
+    tfp->close();
+    exit(0);
+
+}
+*/
+
+

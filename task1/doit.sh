@@ -2,7 +2,7 @@
 
 #cleanup
 rm -rf obj_dir
-rm -f conter.vcd
+rm -f counter.vcd
 
 verilator -Wall --cc --trace counter.sv --exe counter_tb.cpp
 
